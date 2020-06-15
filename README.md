@@ -1,3 +1,3 @@
-# Introduction to the mosts common estimators and computation in causal inference for epidemiologists: A tutorial  
-## Matthew Smith; Miguel Angel Luque-Fernandez 
+# Introduction to Causal Inference Estimators and Computation for epidemiologists: A tutorial  
 ## ICON-LSHTM
+### Matthew Smith & Miguel Angel Luque-Fernandez 
