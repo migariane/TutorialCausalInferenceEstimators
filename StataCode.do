@@ -16,7 +16,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Bug reports: miguel-angel.luque@lshtm.ac.uk	     
 */
-   
+  
+/* Preliminaries */
    clear
     set more off
     cd "C:\Data" 
@@ -24,6 +25,7 @@ Bug reports: miguel-angel.luque@lshtm.ac.uk
     describe
     count
     
+ /* Naive estimate of the ATE */
     // Define the outcome (Y), exposure (A) and confounders (C)
     global Y death_d30 // Outcome
     global A rhc // Exposure or treatment
