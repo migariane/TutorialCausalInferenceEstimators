@@ -2,7 +2,7 @@
 
 ### Matthew J. Smith, Camille Maringe, Bernard Rachet, Mohammad A. Mansournia, Miguel Angel Luque-Fernandez 
 
-### This repository made available to the scientific community the data and the code presented in the Statistics and Medicine (SIM) manuscript:
+### This repository makes available, to the scientific community, the data and the code presented in the Statistics in Medicine (SIM) manuscript:
 
 Smith M.J., Luque‐Fernandez M.A., Schomaker M., Rachet B., Schnitzer M.E.. Tutorial: Introduction to computational causal inference for applied researchers. Statistics in Medicine. 2021; vol(?): pages(?). https://doi...   
 
