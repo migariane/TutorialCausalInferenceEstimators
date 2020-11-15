@@ -191,7 +191,7 @@
     rm(ATE)
     
     
-    ### Box 13: Parametric multivariate regression adjustment using stdReg R-package
+    ### Box 13: Parametric multivariate regression adjustment using "stdReg" R-package
     install.packages("stdReg")
     library(stdReg)
     reg <- glm(Y ~ A + C + w1 + w2 + w3 + w4, data = data, family = poisson(link="log")); summary(reg)
@@ -200,12 +200,11 @@
     plot(reg.std)
     
     
-    ### Box 14: Parametric multivariate regression adjustment using an R package
+    ### Box 14: Parametric multivariate regression adjustment using "margins" R-package
     reg1 <- glm(Y ~ -1 + (A1 + A0) + A1:(C1 + w1 + w2 + w3 + w4) + A0:(C0 + w1 + w2 + w3 + w4) , data=data); summary(reg1)
     poY1m <- margins(reg1, variables="A1"); poY1m
     poY0m <- margins(reg1, variables="A0"); poY0m
     ATE2 <- poY1m$fitted[A==1] - poY0m$fitted[A==0]; mean(ATE2)
-    
     
     ### Box 15 Bootstrap for the multivariate parametric regression adjustment
     library(boot)           # Install the Bootstrap package
@@ -231,7 +230,6 @@
     print(summary(reg.std, contrast="ratio", reference=0))    # 27% (95% CI 1.18-1.37) increase in relative risk
     plot(reg.std)
   
-
 # 4. Inverse Probability of Treatment Weighting
   
   ## 4.1 Inverse probability of treatment weighting based on the propensity score plus regression adjustment
@@ -505,14 +503,14 @@
     # Data generation A: dual misspecification for the model of the outcome and treatment 
     set.seed(7777)
     generateData <- function(n){
-      w1 <- rbinom(n, size=1, prob=0.5)
-      w2 <- rbinom(n, size=1, prob=0.65)
-      w3 <- round(runif(n, min=0, max=4), digits=0) 
-      w4 <- round(runif(n, min=0, max=5), digits=0)
-      A  <- rbinom(n, size=1, prob= plogis(-5 + 0.5*w2 + 0.25*w3 + 0.6*w4 + 0.4*w2*w4)) 
+      w1 <- round(runif(n, min=1, max=5), digits=0) 
+      w2 <- rbinom(n, size=1, prob=0.45)
+      w3 <- round(runif(n, min=0, max=1), digits=0 + 0.75*w2 + 0.8*w1)
+      w4 <- round(runif(n, min=0, max=1), digits=0 + 0.75*w2 + 0.2*w1)
+      A  <- rbinom(n, size=1, prob= plogis(-1 -  0.15*w4 + 1.5*w2 + 0.75*w3 + 0.25*w1 + 0.8*w2*w4))
       # Counterfactuals
-      Y.1 <- rbinom(n, size=1, prob = plogis(-1 + 1 -0.1*w1 + 0.35*w2 + 0.25*w3 + 0.20*w4 + 0.15*w2*w4))
-      Y.0 <- rbinom(n, size=1, prob = plogis(-1 + 0 -0.1*w1 + 0.35*w2 + 0.25*w3 + 0.20*w4 + 0.15*w2*w4)) 
+      Y.1 <- rbinom(n, size=1, prob = plogis(-3 + 1 + 0.25*w4 + 0.75*w3 + 0.8*w2*w4 + 0.05*w1))
+      Y.0 <- rbinom(n, size=1, prob = plogis(-3 + 0 + 0.25*w4 + 0.75*w3 + 0.8*w2*w4 + 0.05*w1)) 
       # Observed outcome
       Y <- Y.1*A + Y.0*(1 - A)
       # return data.frame
@@ -591,13 +589,13 @@
     # Mean AIPTW
     mean(ATE_AIPTW)
     mean(RR_AIPTW)
-    # Estimate of TMLE
+    # Estimate of TMLE by hand
     mean(ATEtmle1)
     mean(RRtmle1)
-    # Estimate of TMLE + SL
+    # Estimate of TMLE + SL default implementation
     mean(ATEtmle2)
     mean(RRtmle2)
-    # Estimate of TMLE + SL2
+    # Estimate of TMLE + SL2 default plus more algorithms
     mean(ATEtmle3)
     mean(RRtmle3)
     save.image("your path\results.RData")
