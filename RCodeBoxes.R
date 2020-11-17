@@ -600,10 +600,18 @@
     mean(RRtmle3)
     save.image("your path\results.RData")
     
+# Relative Bias ATE
+abs(mean((True_ATE - ATE_AIPTW) / True_ATE)*100)
+abs(mean((True_ATE - ATEtmle1) / True_ATE)*100)
+abs(mean((True_ATE - ATEtmle2) / True_ATE)*100)
+abs(mean((True_ATE - ATEtmle3) / True_ATE)*100)
 
-  
-    
-    
+# Relative Bias RR 
+abs(mean((True_RR - naive_RR) / True_RR)*100)
+abs(mean((True_RR - RR_AIPTW) / True_RR)*100)
+abs(mean((True_RR - RRtmle1) / True_RR)*100)
+abs(mean((True_RR - RRtmle2) / True_RR)*100)
+abs(mean((True_RR - RRtmle3) / True_RR)*100)    
     
     
     
