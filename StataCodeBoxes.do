@@ -60,6 +60,8 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			* you may need to install the command sumup, type:
 			* ssc install sumup
             sumup $Y, by($A $C)
+			* from sumup command extract the conditinal means by the given A and C levels i.e. zero and one
+			* see matrix list y00: position subscript [3,1] is th one of interest
             matrix y00 = r(Stat1)
             matrix y01 = r(Stat2)
             matrix y10 = r(Stat3)
