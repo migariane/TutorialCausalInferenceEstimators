@@ -114,9 +114,9 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             qui bootstrap r(ate), reps(1000): ATE
             estat boot, all	
     	
-        * 2) For the ATET
-            capture program drop ATET
-            program define ATET, rclass
+        * 2) For the ATT
+            capture program drop ATT
+            program define ATT, rclass
                capture drop y1
                capture drop y0
                capture drop ATT
@@ -130,7 +130,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
                return scalar atet = `r(mean)'
             end
             
-            qui bootstrap r(atet), reps(1000): ATET
+            qui bootstrap r(atet), reps(1000): ATT
             estat boot, all
             	
             drop ATE ATT
