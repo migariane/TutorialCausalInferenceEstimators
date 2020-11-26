@@ -127,10 +127,10 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
                matrix y11 = r(Stat4)
                gen ATT = ((y11[3,1]-y01[3,1]))*gendermatet + ((y10[3,1]-y00[3,1]))*genderfatet
                qui sum ATT
-               return scalar atet = `r(mean)'
+               return scalar att = `r(mean)'
             end
             
-            qui bootstrap r(atet), reps(1000): ATT
+            qui bootstrap r(att), reps(1000): ATT
             estat boot, all
             	
             drop ATE ATT
