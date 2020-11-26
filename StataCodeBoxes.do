@@ -66,9 +66,11 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             matrix y01 = r(Stat2)
             matrix y10 = r(Stat3)
             matrix y11 = r(Stat4)
-            gen ATE = ((y11[3,1]-y01[3,1]))*genderm + ((y10[3,1]-y00[3,1]))*genderf
-            qui: sum ATE
-            display "The ATE is: "  "`r(mean)'"
+            gen EY1 = ((y11[3,1]-y01[3,1]))*genderm 
+			gen EY0 = ((y10[3,1]-y00[3,1]))*genderf
+            qui: mean EY1 EY0
+			matrix ATE =  r(table) 
+            display "The ATE is: "  ATE[1,1] + ATE[1,2]
             drop ATE 
             * The ATE from non-parametric estimator is:  0.073692
 
