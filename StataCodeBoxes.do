@@ -71,9 +71,13 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             qui: mean EY1 EY0
 			matrix ATE =  r(table) 
             display "The ATE is: "  ATE[1,1] + ATE[1,2]
-            drop ATE 
+            drop EY*
             * The ATE from non-parametric estimator is:  0.073692
-
+			// Also one can try
+			gen ATE = ((y11[3,1]-y01[3,1]))*genderm + ((y10[3,1]-y00[3,1]))*genderf
+			qui sum ATE
+			drop ATE
+			
             * Check that Stata "teffects" command obtains the same estimate
             teffects ra ($Y $C) ($A)
             * The ATE from "teffects" implementation is:  0.073692
@@ -85,13 +89,19 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             matrix m=e(b)
             gen genderfatet = m[1,1]
             gen gendermatet = m[1,2]
-            gen ATT = ((y11[3,1]-y01[3,1]))*gendermatet + ((y10[3,1]-y00[3,1]))*genderfatet
-            qui: sum ATT
-            display "The ATT is: "  "`r(mean)'"
-            drop ATT
+			gen EY1 = ((y11[3,1]-y01[3,1]))*gendermatet 
+			gen EY0 = ((y10[3,1]-y00[3,1]))*genderfatet
+			qui: mean EY1 EY0
+			matrix ATT =  r(table) 
+			display "The ATT is: "  ATT[1,1] + ATT[1,2] // Applying the G-formula
+            drop EY*
             * The ATT from non-parametric estimator is:  0.073248
-
-            * Check using Stata "teffects" command
+			// Also one can try
+			gen ATT = ((y11[3,1]-y01[3,1]))*gendermatet + ((y10[3,1]-y00[3,1]))*genderfatet
+			qui sum ATT
+			drop ATT            
+			
+			* Check using Stata "teffects" command
             teffects ra ($Y $C) ($A), atet	
             * The ATT from "teffects" implementation is:  0.073248
    
