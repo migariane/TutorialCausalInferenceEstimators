@@ -60,23 +60,18 @@
   
   ## 3.1 Non-parametric G-formula
   
-  
-    ### Box 3: Estimate the marginal probabilities of the confounder
+    ### Box 3: Non-parametric G-formula for the ATE 
     mean(data$A[data$C==1], na.rm=TRUE)       # 
     mean(data$A[data$C==0], na.rm=TRUE)       # 
     mean(data$Y[data$A==1], na.rm=TRUE) - mean(data$Y[data$A==0],na.rm=TRUE)    # Unadjusted Estimate
     reg <- lm(Y ~ A, data=data); reg          # Unadjusted Estimate Regression 
     pr.l <- prop.table(table(data$C)); pr.l   # Marginal probability of C
-
-    
-    ### Box 4: Non-parametric G-formula for the ATE 
     tab.out <- aggregate(Y ~ A + C, data, mean); tab.out    # Table of Means in 
     ATE <- ((mean(data$Y[data$A==1 & data$C==1]) - mean(data$Y[data$A==0 & data$C==1]))*pr.l[2]) + 
      (mean(data$Y[data$A==1 & data$C==0]) - mean(data$Y[data$A==0 & data$C==0]))*pr.l[1]   # G-formula Non-parametric ATE 
     ATE; rm(ATE)    # The ATE from the non-parametric estimator is 0.073692
     
-    
-    ### Box 5: Non-parametric G-formula for the ATT
+    ### Box 4: Non-parametric G-formula for the ATT
     ATTm <- mean(data$C[data$A==1], na.rm=TRUE)       # Proportion of those who are male amongst treated
     ATTf <- 1-mean(data$C[data$A==1], na.rm=TRUE)       # Proportion of those who are female amongst treated  
     ATT <-((mean(data$Y[data$A==1 & data$C==1]) - mean(data$Y[data$A==0 & data$C==1]))*ATTm) + 
@@ -84,7 +79,7 @@
     ATT       # The ATT from the non-parametric estimator is 0.073248
     rm(ATT)
     
-    ### Box 6: Bootstrap the 95% confidence intervals (CI) for the ATE/ATT estimated using the non-parametric G-Formula
+    ### Box 5: Bootstrap the 95% confidence intervals (CI) for the ATE/ATT estimated using the non-parametric G-Formula
     # ATE
     library(boot)
     g.comp = function(data,indices)     # Define the function to estimate the ATE
@@ -117,7 +112,7 @@
     boot.ci(boot.out,type="norm",conf=0.95)
     
   
-    ### Box 7: Non-parametric G-Formula using a fully saturated regression model in Stata (A)
+    ### Box 6: Non-parametric G-Formula using a fully saturated regression model in Stata (A)
         # Method 1: conditional probabilities
     data$A1 <- ifelse(data$A == 1, 1, 0)
     data$A0 <- ifelse(data$A == 0, 1, 0)
@@ -127,7 +122,7 @@
     ATE <- mean((reg$coefficients[1] + reg$coefficients[3]*C) - (reg$coefficients[2] + reg$coefficients[4]*C)); ATE
     rm(ATE)
     
-    ### Box 8: Non-parametric G-Formula using a fully saturated regression model in Stata (B)
+    ### Box 7: Non-parametric G-Formula using a fully saturated regression model in Stata (B)
         # Method 2: Marginal probabilities
     install.packages("margins")
     library(margins)
@@ -138,7 +133,7 @@
     rm(ATE)
     
   ## 3.2 Parametric G-formula
-    ### Box 9: Parametric G-formula by hand
+    ### Box 8: Parametric G-formula by hand
     mod1  <- glm(Y ~  C, family="binomial", data=data[data$A==1,])    # Expected probability amongst those with RHC
     mod0  <- glm(Y ~  C, family="binomial", data=data[data$A==0,])    # Expected probability amongst those without RHC
     GcompRA  <- cbind(Y1 = predict(mod1, newdata=data.frame(A = 1, C), type="response"),
@@ -150,7 +145,7 @@
     rm(ATE)
   
     
-    ### Box 10: Parametric regression adjustment (one confounder) using stdReg R-package
+    ### Box 9: Parametric regression adjustment (one confounder) using stdReg R-package
     install.packages("stdReg")
     library(stdReg)
     reg <- glm(Y ~ A + C, data = data, family = poisson(link="log")); summary(reg)
@@ -158,8 +153,7 @@
     print(summary(reg.std, contrast = "difference", reference=0))
     plot(reg.std)
 
-  
-    ### Box 11: Bootstrap for the parametric regression adjustment one confounder)
+    ### Box 10: Bootstrap for the parametric regression adjustment one confounder)
     library(boot)           # Install the Bootstrap package
     attach(data)          
     g.comp=function(data,indices)       # Define the function to estimate the ATE
@@ -175,11 +169,10 @@
     boot.out=boot(data,g.comp,200)        # Draw 1000 bootstrap sample estimates of RD
     boot.ci(boot.out,type="norm",conf=0.95)     # Bootstrapped 95% CI based on normal approximation
     boot.ci(boot.out,type="perc",conf=0.95)     # Bootstrapped 95% CI based on percentiles of the bootstrap replicates
-
     
     # Now with more than one confounder
     
-    ### Box 12: Parametric multivariate regression adjustment implementation of the G-Formula
+    ### Box 11: Parametric multivariate regression adjustment implementation of the G-Formula
     mod1  <- glm(Y ~  C + w1 + w2 + w3 + w4, family="binomial", data=data[data$A==1,])    # Expected probability amongst those with RHC
     mod0  <- glm(Y ~  C + w1 + w2 + w3 + w4, family="binomial", data=data[data$A==0,])    # Expected probability amongst those without RHC
     GcompRA  <- cbind(Y1 = predict(mod1, newdata=data.frame(A = 1, C, w1, w2, w3, w4), type="response"),
@@ -191,7 +184,7 @@
     rm(ATE)
     
     
-    ### Box 13: Parametric multivariate regression adjustment using "stdReg" R-package
+    ### Box 12: Parametric multivariate regression adjustment using "stdReg" R-package
     install.packages("stdReg")
     library(stdReg)
     reg <- glm(Y ~ A + C + w1 + w2 + w3 + w4, data = data, family = poisson(link="log")); summary(reg)
@@ -200,13 +193,13 @@
     plot(reg.std)
     
     
-    ### Box 14: Parametric multivariate regression adjustment using "margins" R-package
+    ### Box 13: Parametric multivariate regression adjustment using "margins" R-package
     reg1 <- glm(Y ~ -1 + (A1 + A0) + A1:(C1 + w1 + w2 + w3 + w4) + A0:(C0 + w1 + w2 + w3 + w4) , data=data); summary(reg1)
     poY1m <- margins(reg1, variables="A1"); poY1m
     poY0m <- margins(reg1, variables="A0"); poY0m
     ATE2 <- poY1m$fitted[A==1] - poY0m$fitted[A==0]; mean(ATE2)
     
-    ### Box 15 Bootstrap for the multivariate parametric regression adjustment
+    ### Box 14 Bootstrap for the multivariate parametric regression adjustment
     library(boot)           # Install the Bootstrap package
     attach(data)          
     g.comp=function(data,indices)       # Define the function to estimate the ATE
@@ -224,7 +217,7 @@
     boot.ci(boot.out,type="perc",conf=0.95)     # Bootstrapped 95% CI based on percentiles of the bootstrap replicates
   
   
-    ### Box 16 Computing the parametric marginal risk ratio after regression adjustment
+    ### Box 15 Computing the parametric marginal risk ratio after regression adjustment
     reg <- glm(Y ~ A + C + w1 + w2 + w3 + w4, data=data2, family = binomial(link="logit")); summary(reg)
     reg.std <- stdGlm(fit=reg, data=data2, X="A", x=seq(0,1))
     print(summary(reg.std, contrast="ratio", reference=0))    # 27% (95% CI 1.18-1.37) increase in relative risk
@@ -234,7 +227,7 @@
   
   ## 4.1 Inverse probability of treatment weighting based on the propensity score plus regression adjustment
     
-    # Box 17 (IPTW by hand)
+    # Box 16 (IPTW by hand)
     p.s <- glm(A ~ as.factor(C) + w1 + w2 + w3 + w4, data=data, family=binomial)      # Propensity score mmodel for the exposure
     p.score <- ifelse(data$A == 0, 1 - predict(p.s, type = "response"), predict(p.s, type = "response"))  # Assign Propensity score weights
     #table(p.score)      # Table of Propensity Scores
@@ -246,7 +239,7 @@
     rm(ATE)
   
     
-    # Box 18 Bootstrap computation for the IPTW estimator
+    # Box 17 Bootstrap computation for the IPTW estimator
     library(boot)
     iptw.w = function(data,indices)     # Define the function to estimate the ATE
     {
@@ -259,7 +252,7 @@
     boot.ci(boot.out,type="norm",conf=0.95)
 
   
-    ### Box 19: Computation of the IPTW estimator for the ATE using IPW R-package
+    ### Box 18: Computation of the IPTW estimator for the ATE using IPW R-package
     install.packages("ipw", "survey")
     library(ipw)
     library(survey)
@@ -291,7 +284,7 @@
     coef(msm);  confint(msm)
   
     
-    ### Box 20: Assessing IPTW balance
+    ### Box 19: Assessing IPTW balance
     install.packages("twang")
     library(twang)
     ps.balance <- ps(A ~ C + w1 + w2 + w3 + w4, data = data2, 
@@ -302,7 +295,7 @@
     data2.balance <- bal.table(ps.balance); data2.balance  
     
     
-    ### Box 21: Assessing IPTW overlap by hand
+    ### Box 20: Assessing IPTW overlap by hand
     install.packages("xtable")
     library(xtable)
     pretty.tab <- data2.balance$ks.max.ATE[,c("tx.mn","ct.mn","ks")]
@@ -311,9 +304,9 @@
     xtable(pretty.tab, caption = "Balance of the treatment and comparison groups",
            label = "tab:balance", digits = c(0, 2, 2, 2, 2), align=c("l","r","r","r","r"))
     plot(ps.balance, plots = 6)
-  
     
-    ### Box 22: Assessing overlap using plots
+    
+    ### Box 21: Assessing overlap using plots
     # Fit a propensity score model
     m_PS<-glm(A ~ C + w1 + w2 + w3 + w4, data = data2, family=binomial(link="logit"))
     summary(m_PS)
@@ -338,7 +331,7 @@
     data$overlap <- ifelse(data$PS>=min(data$PS[data$rhc==1]) & data$PS<=max(data$PS[data$rhc==0]),1,0); table(data$overlap,data$rhc)
     
   ## 4.2 Marginal structural model with stabilised weights
-    ### Box 23: Computation of the IPTW estimator for the ATE using a MSM
+    ### Box 22: Computation of the IPTW estimator for the ATE using a MSM
     
     # Unstabilized weights 
     msm <- lm(Y  ~ A + C +  w1 + w2 + w3 + w4, data = data, weights = data$w)     # MSM
@@ -369,7 +362,7 @@
     cbind(beta, lcl, ucl)[2,]     
 
   ## 4.3 IPTW with regression adjustment  
-    ### Box 24: Computation of the IPTW-RA estimator for the ATE and bootstrap for statistical inference
+    ### Box 23: Computation of the IPTW-RA estimator for the ATE and bootstrap for statistical inference
     glm1  <- glm(Y ~ C + w1 + w2 + w3 + w4,  weights = data$w[data$A==1], data=data[data$A==1,])
     Y.1 = predict(glm1,  newdata=data.frame(A = 1, C, w1, w2, w3, w4), type="response")
     glm2  <- glm(Y ~ C + w1 + w2 + w3 + w4,  weights = data$w[data$A==0], data=data[data$A==0,])
@@ -378,7 +371,7 @@
     ATE2 <- mean(data$w*as.numeric(data$A==1)*Y.1)/mean( data$w*as.numeric(data$A==1)) - mean(data$w*as.numeric(data$A==0)*Y.0)/mean(data$w*as.numeric(data$A==0));ATE2
     rm(ATE, ATE2)
   
-    ### Box 25: Computation of the IPTW-RA estimator for the ATE using the ipw R-package
+    ### Box 24: Computation of the IPTW-RA estimator for the ATE using the ipw R-package
     library(ipw)
     ipw.ATE <- ipwpoint(exposure = A, family = "binomial", link = "logit", 
                         numerator = ~ C, 
@@ -396,7 +389,7 @@
   
 # 5. Augmented inverse probability weighting
     
-    ### Box 26: Computation of the AIPTW estimator for the ATE and bootstrap for statistical inference
+    ### Box 25: Computation of the AIPTW estimator for the ATE and bootstrap for statistical inference
     mod  <- glm(Y ~ A + C + w1 + w2 + w3 + w4, family="binomial", data=data)
     PO   <- cbind(Yhat = predict(mod),
                   Y1 = predict(mod, newdata=data.frame(A = 1, C, w1, w2, w3, w4), type="response"),
@@ -436,7 +429,7 @@
     boot.ci(boot.out,type="perc",conf=0.95)     # compute confidence intervals using percentile method
     boot.ci(boot.out,type="norm",conf=0.95)
     
-    ### Box 27: Computation of the AIPTW estimator for the ATE and marginal risk ratio
+    ### Box 26: Computation of the AIPTW estimator for the ATE and marginal risk ratio
     w <- subset(data, select=c(C, w1, w2, w3 , w4))
     fit1 <- drtmle(W = w, A = A, Y = Y, # input data
                    a_0 = c(0, 1), # return estimates for A = 0 and A = 1
@@ -458,7 +451,7 @@
     
 # 6. DATA-ADAPTIVE ESTIMATION: ENSEMBLE LEARNING TARGETED MAXIMUMLIKELIHOOD ESTIMATION
     
-    ### Box 28: Computational implementation of TMLE by hand
+    ### Box 27: Computational implementation of TMLE by hand
     # Step 1
     Gcomp <- glm(Y ~ A + C + w1 + w2 + w3 + w4, family="binomial", data=data2)
     # Prediction for A, A=1 and, A=0
@@ -483,7 +476,7 @@
     RR <- (T1.EY1/T1.EY0); RR
     rm(ATE, RR)
     
-    ### Box 29: TMLE with data-adaptive estimation using the R package
+    ### Box 28: TMLE with data-adaptive estimation using the R package
     set.seed(777)
     library(tmle)
     w <- subset(data, select=c(C, w1, w2, w3 , w4))
@@ -493,7 +486,7 @@
     fittmle
   
 #  7. Simulation
-    ### Box 30: Data generation for the Monte Carlo experiment
+    ### Box 29: Data generation for the Monte Carlo experiment
     
     rm(list=ls())
     
