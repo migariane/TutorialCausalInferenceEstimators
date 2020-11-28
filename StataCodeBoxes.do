@@ -48,15 +48,13 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 /* 3.1 Non-parametric G-formula */
        
 	   * 1) ATE    
-/* Box 3: Estimate the marginal probabilities */
+/* Box 3: Non-parametric G-Formula for the ATE */
             proportion $C
             matrix m=e(b)
             gen genderf = m[1,1]
             sum genderf
             gen genderm = m[1,2]
             sum genderm
-
-/* Box 4: Non-parametric G-Formula for the ATE */
 			* you may need to install the command sumup, type:
 			* ssc install sumup
             sumup $Y, by($A $C)
@@ -83,7 +81,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             * The ATE from "teffects" implementation is:  0.073692
     	
         * 2) ATT
-/* Box 5: Non-parametric G-Formula for the ATT */
+/* Box 4: Non-parametric G-Formula for the ATT */
             * Estimate the marginal probabilities
             proportion $C if $A==1
             matrix m=e(b)
@@ -105,7 +103,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             teffects ra ($Y $C) ($A), atet	
             * The ATT from "teffects" implementation is:  0.073248
    
-/* Box 6: Bootstrap 95% Confidence Intervals (CI) for the ATE/ATT estimated using the Non-parametric G-Formula */
+/* Box 5: Bootstrap 95% Confidence Intervals (CI) for the ATE/ATT estimated using the Non-parametric G-Formula */
         
 		* 1) For the ATE
 			capture program drop ATE
@@ -147,7 +145,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             	
             drop ATE ATT
     	
-/* Box 7: Non-parametric G-Formula using a fully saturated regression model in Stata (A) */
+/* Box 6: Non-parametric G-Formula using a fully saturated regression model in Stata (A) */
 			* method 1: conditional probabilities
             regress $Y ibn.$A ibn.$A#c.($C) , noconstant vce(robust) coeflegend
             predictnl ATE = (_b[1.rhc] + _b[1.rhc#c.gender]*gender) - (_b[0bn.rhc] + _b[0bn.rhc#c.gender]*gender)
@@ -155,7 +153,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
             display "The ATE is:  " "`r(mean)'"
             drop ATE
 			
-/* Box 8: Non-parametric G-Formula using a fully saturated regression model in Stata (B) */
+/* Box 7: Non-parametric G-Formula using a fully saturated regression model in Stata (B) */
 			* method 2: marginal probabilities
             regress $Y ibn.$A ibn.$A#c.($C) , noconstant vce(robust) coeflegend
 			
@@ -169,7 +167,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 
 * One confounder
 
-/* Box 9: Parametric G-formula */		
+/* Box 8: Parametric G-formula */		
 			* Calculations by hand
 			* Expected probability amongst treated
 			regress $Y $C if $A==1      
@@ -183,10 +181,10 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			* Difference between expected probabilities (ATE) and biased confidence interval
 			lincom _b[y1hat] - _b[y0hat]  
 	
-/* Box 10: Parametric regression adjustment using Stata's teffects (one confounder) */
+/* Box 9: Parametric regression adjustment using Stata's teffects (one confounder) */
 			teffects ra ($Y $C) ($A) 
 
-/* Box 11: Bootstrap for the parametric regression adjustment */
+/* Box 10: Bootstrap for the parametric regression adjustment */
 			capture program drop ATE
 			program define ATE, rclass
 			   capture drop y1
@@ -206,7 +204,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 
 * More than one confounder
 
-/* Box 12: Parametric multivariate regression adjustment implementation of the G-Formula */
+/* Box 11: Parametric multivariate regression adjustment implementation of the G-Formula */
 			regress $Y $W if $A==1
 			predict double y1hat 
 			regress $Y $W if $A==0
@@ -214,15 +212,15 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			mean y1hat y0hat
 			lincom _b[y1hat] - _b[y0hat]
 		
-/* Box 13: Parametric multivariate regression adjustment using Stata’s teffects command */	
+/* Box 12: Parametric multivariate regression adjustment using Stata’s teffects command */	
 			teffects ra ($Y $W) ($A)
 
-/* Box 14: Parametric multivariate regression adjustment using Stata’s margins command */
+/* Box 13: Parametric multivariate regression adjustment using Stata’s margins command */
 			regress $Y ibn.$A ibn.$A#c.($W) , noconstant vce(robust)
 			margins $A, vce(unconditional)
 			margins r.$A, contrast(nowald)
 		
-/* Box 15: Bootstrap for the multivariate parametric regression adjustment */
+/* Box 14: Bootstrap for the multivariate parametric regression adjustment */
 			capture program drop ATE
 			program define ATE, rclass
 			   capture drop y1
@@ -240,16 +238,20 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			qui bootstrap r(ace), reps(1000): ATE dots
 			estat boot, all
 
-/* Box 16: Computing the parametric marginal risk ratio after regression adjustment */
+/* Box 15: Computing the parametric marginal risk ratio after regression adjustment */
 			teffects  ra ($Y $W) ($A), aequations
 			teffects  ra ($Y $W) ($A), coeflegend
 			nlcom  100*_b[ATE:r1vs0.$A]/_b[POmean:0.$A]   
 			* 27.4% increase  in  relative  risk
-		
+			teffects  ra ($Y $W) ($A), pom coeflegend
+			nlcom _b[POmeans:1.rhc]/ _b[POmeans:0bn.rhc]
+		    *eltmle to check marginal RR
+			eltmle  $Y $A $W, tmle
+
 /* 4 Inverse probability of treatment weighting  */		
 /* 4.1 Inverse probability of treatment weighting based on the propensity score plus regression adjustment */
 
-/* Box 17: Computation of the IPTW estimator for the ATE */
+/* Box 16: Computation of the IPTW estimator for the ATE */
 			* propensity score model for the exposure
 			logit $A $W, vce(robust) nolog
 			
@@ -269,7 +271,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			scalar Y0 = _b[_cons]
 			display "ATE =" Y1 - Y0
 	
-/* Box 18: Bootstrap computation for the IPTW estimator */
+/* Box 17: Bootstrap computation for the IPTW estimator */
 			* Bootstrap the confidence intervals
 			capture program drop ATE
 			program define ATE, rclass
@@ -288,10 +290,10 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			qui bootstrap r(ace), reps(1000): ATE
 			estat boot, all
     
-/* Box 19: Computation of the IPTW estimator for the ATE using Stata’s teffects command */ 
+/* Box 18: Computation of the IPTW estimator for the ATE using Stata’s teffects command */ 
 			teffects ipw ($Y) ($A $W, logit), nolog vsquish
 
-/* Box 20: Assessing IPTW balance */
+/* Box 19: Assessing IPTW balance */
 			* Stata teffects and tebalance commands
 			qui teffects ipw ($Y) ($A $W)   
 			tebalance summarize
@@ -307,7 +309,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			regress  genderst  $A 		 	// Raw  difference
 			regress  genderst  $A [pw=ipw]  // Standardized  difference
 		
-/* Box 21: Assessing IPTW overlap by hand */
+/* Box 20: Assessing IPTW overlap by hand */
 			sort $A
 			by $A: summarize ps
 			kdensity ps if $A==1, generate(x1pointsa d1A) nograph n(10000) 
@@ -316,13 +318,13 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			label variable d0A "density for RHC=0"
 			twoway (line d0A x0pointsa , yaxis(1))(line d1A x1pointsa, yaxis(2))
 		
-/* Box 22: Assessing overlap using Stata's teffects overlap */
+/* Box 21: Assessing overlap using Stata's teffects overlap */
 			qui: teffects ipw ($Y) ($A $W, logit), nolog vsquish
 			teffects overlap
 
 			
 /* 4.2 Marginal structural model with stabilized weights */		
-/* Box 23: Computation of the IPTW estimator for the ATE using a MSM */
+/* Box 22: Computation of the IPTW estimator for the ATE using a MSM */
 			* Baseline treatment probabilities
 			logit $A, vce(robust) nolog
 			predict double nps, pr
@@ -351,7 +353,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 
 /* 4.3 IPTW with regression adjustment */
 		
-/* Box 24: Computation of the IPTW-RA estimator for the ATE and bootstrap for statistical inference */
+/* Box 23: Computation of the IPTW-RA estimator for the ATE and bootstrap for statistical inference */
 			capture program drop ATE
 			program define ATE, rclass
 			   capture drop y1
@@ -371,12 +373,16 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			qui bootstrap r(ace), reps(10): ATE
 			estat boot, all
 		
-/* Box 25: Computation of the IPTW-RA estimator for the ATE using Stata’s teffects */
+/* Box 24: Computation of the IPTW-RA estimator for the ATE using Stata’s teffects */
 			teffects ipwra ($Y $W) ($A $W)
 			nlcom 100*_b[r1vs0.$A]/_b[POmean:0.$A]
+		    teffects  ipwra ($Y $W) ($A $W), pom coeflegend
+			nlcom _b[POmeans:1.rhc]/ _b[POmeans:0bn.rhc]
+		    *eltmle to check marginal RR
+			eltmle  $Y $A $W, tmle
     
 /* 5. Augmented inverse probability weighting */	
-/* Box 26: Computation of the AIPTW estimator for the ATE and bootstrap for statistical inference */
+/* Box 25: Computation of the AIPTW estimator for the ATE and bootstrap for statistical inference */
 			* Step (i) prediction model for the outcome
 			qui glm $Y $A $W, fam(bin) 
 			predict double QAW, mu
@@ -430,15 +436,16 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			qui bootstrap r(ace), reps(1000): ATE
 			estat boot, all
 
-/* Box 27: Computation of the AIPTW estimator for the ATE and marginal risk ratio using Stata’s teffects */
+/* Box 26: Computation of the AIPTW estimator for the ATE and marginal risk ratio using Stata’s teffects */
 			teffects aipw ($Y $W) ($A $W, logit)
-			
-			* Relative  Risk
+			*  marginal Relative  Risk
 			nlcom 100*_b[r1vs0.$A]/_b[POmean:0.$A]	
-		
+			*  another way to compute it
+			teffects aipw ($Y $W) ($A $W, logit), pom coeflegend
+	        nlcom _b[POmeans:1.rhc]/ _b[POmeans:0bn.rhc]
 		
 /* 6. DATA-ADAPTIVE ESTIMATION: ENSEMBLE LEARNING TARGETED MAXIMUMLIKELIHOOD ESTIMATION*/
-/*Box 28: Computational implementation of TMLE by hand */
+/*Box 27: Computational implementation of TMLE by hand */
 
 			* Step 1: prediction model for the outcome Q0 (g-computation)
 			glm $Y $A $W, fam(binomial)
@@ -496,7 +503,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			global UCI =  $ATE + 1.96*sqrt(varIC)
 			display "ATE:"  %05.4f  $ATE _col(15) "95%CI: " %05.4f  $LCI "," %05.4f  $UCI		
 
-/* Box 29: TMLE with data-adaptive estimation using the Stata’s user writen eltmle */
+/* Box 28: TMLE with data-adaptive estimation using the Stata’s user writen eltmle */
 			* if not already installed, type:
 			* ssc install eltmle		
 			preserve
@@ -505,7 +512,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 
 		
 /* 7. Simulation */
-/* Box 30: Data generation for the Monte Carlo experiment */
+/* Box 29: Data generation for the Monte Carlo experiment */
 
 			* Data generation
 			clear
