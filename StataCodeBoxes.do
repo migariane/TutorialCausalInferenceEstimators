@@ -245,8 +245,7 @@ The rhc dataset can be dowloaded at http://biostat.mc.vanderbilt.edu/wiki/Main/D
 			* 27.4% increase  in  relative  risk
 			teffects  ra ($Y $W) ($A), pom coeflegend
 			nlcom _b[POmeans:1.rhc]/ _b[POmeans:0bn.rhc]
-		    *eltmle to check marginal RR
-			eltmle  $Y $A $W, tmle
+			* 27.4% increase  in  relative  risk
 
 /* 4 Inverse probability of treatment weighting  */		
 /* 4.1 Inverse probability of treatment weighting based on the propensity score plus regression adjustment */
