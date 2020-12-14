@@ -1,4 +1,4 @@
-# Tutorial: Introduction to computational causal inference for applied researchers and epidemilogists
+# Tutorial: Introduction to computational causal inference for applied researchers and epidemiologists
 
 ### Matthew James Smith, Camille Maringe, Bernard Rachet, Mohammad A. Mansournia, Paul Zivich, Stephen R. Cole, Miguel Angel Luque Fernandez
 
