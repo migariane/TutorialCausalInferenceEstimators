@@ -1,1 +1,8 @@
+#### Python ####
 .ipynb_checkpoints/*
+### R ###
+# History files
+.Rhistory
+.Rapp.history
+# User-specific files
+.Ruserdata
