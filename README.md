@@ -4,7 +4,7 @@
 
 ### This repository makes available to the scientific community the data and code used in the preprint manuscript available at
 
-[Link to the preprint article](https://...)
+[Link to the preprint article](https://arxiv.org/abs/2012.09920)
 
 ### CITE this repository:
 
