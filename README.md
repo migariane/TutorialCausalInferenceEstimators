@@ -8,7 +8,7 @@
 
 ### CITE this repository:
 
-[![DOI](https://zenodo.org/badge/...)](https://zenodo.org/badge/latestdoi/...)
+[![DOI](https://zenodo.org/badge/272439035.svg)](https://zenodo.org/badge/latestdoi/272439035)  
 
 ### Matthew James Smith, Camille Maringe, Bernard Rachet, Mohammad A. Mansournia, Paul Zivich, Stephen R. Cole, Miguel Angel Luque Fernandez
 
